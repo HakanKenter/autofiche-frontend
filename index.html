@@ -611,15 +611,31 @@ async function publierSurShopify() {
       { key: 'texte_3', value: (blocsFinaux.texte3 || '').replace(/\n/g, '<br>') },
     ];
 
-    await Promise.all(metafields.map(mf =>
-      fetch(`${PROXY}/products/${currentProduct.id}/metafields.json`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          metafield: { namespace: 'custom', key: mf.key, value: mf.value, type: 'single_line_text_field' }
-        })
-      })
-    ));
+    // Upsert metafields : chercher si existants puis PUT, sinon POST
+    for (const mf of metafields) {
+      // Chercher le metafield existant
+      const listRes = await fetch(`${PROXY}/products/${currentProduct.id}/metafields.json`);
+      const listData = await listRes.json();
+      const existing = listData.metafields?.find(m => m.namespace === 'custom' && m.key === mf.key);
+
+      if (existing) {
+        // Mettre à jour
+        await fetch(`${PROXY}/metafields/${existing.id}.json`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ metafield: { id: existing.id, value: mf.value } })
+        });
+      } else {
+        // Créer
+        await fetch(`${PROXY}/products/${currentProduct.id}/metafields.json`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            metafield: { namespace: 'custom', key: mf.key, value: mf.value, type: 'multi_line_text_field' }
+          })
+        });
+      }
+    }
 
     setDot(5, 'done');
     showStatus('status5', 'success',
