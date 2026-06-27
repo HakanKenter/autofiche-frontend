@@ -3,114 +3,78 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AutoFiche — Luminaire Essenza</title>
+<title>AutoFiche</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;500&display=swap');
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  :root { --black: #1b1b1b; --white: #fff; --gray-100: #f5f5f5; --gray-200: #e8e8e8; --gray-400: #999; --gray-600: #555; --radius: 8px; --shadow: 0 2px 12px rgba(0,0,0,0.08); }
+  :root { --black: #1b1b1b; --white: #fff; --gray-100: #f5f5f5; --gray-200: #e8e8e8; --gray-400: #999; --gray-600: #555; --green: #1a7a4a; --radius: 8px; --shadow: 0 2px 12px rgba(0,0,0,0.08); }
   body { font-family: 'Inter', sans-serif; background: var(--gray-100); color: var(--black); min-height: 100vh; }
-  header { background: var(--black); color: var(--white); padding: 18px 32px; display: flex; align-items: center; gap: 14px; }
-  header .logo { font-family: 'Playfair Display', serif; font-size: 18px; letter-spacing: 0.02em; }
-  header .badge { font-size: 11px; background: rgba(255,255,255,0.15); padding: 3px 10px; border-radius: 20px; }
-  .container { max-width: 900px; margin: 0 auto; padding: 32px 20px; }
+  header { background: var(--black); color: var(--white); padding: 18px 32px; }
+  header .logo { font-family: 'Playfair Display', serif; font-size: 18px; }
+  .container { max-width: 860px; margin: 0 auto; padding: 32px 20px; }
   .card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 28px; margin-bottom: 20px; }
+  .card.disabled { opacity: 0.4; pointer-events: none; }
   .step-label { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray-400); margin-bottom: 8px; }
   .step-title { font-size: 17px; font-weight: 600; margin-bottom: 18px; }
   .input-row { display: flex; gap: 10px; }
-  input, textarea { font-family: 'Inter', sans-serif; font-size: 14px; padding: 11px 14px; border: 1.5px solid var(--gray-200); border-radius: var(--radius); outline: none; transition: border-color 0.2s; width: 100%; color: var(--black); background: var(--white); }
+  input[type="url"], input[type="text"], input[type="number"], textarea {
+    font-family: 'Inter', sans-serif; font-size: 14px; padding: 11px 14px;
+    border: 1.5px solid var(--gray-200); border-radius: var(--radius);
+    outline: none; transition: border-color 0.2s; width: 100%; color: var(--black); background: var(--white);
+  }
   input:focus, textarea:focus { border-color: var(--black); }
+  textarea { resize: vertical; line-height: 1.6; }
   .btn { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; padding: 11px 22px; border-radius: var(--radius); border: none; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
   .btn-primary { background: var(--black); color: var(--white); }
   .btn-primary:hover { background: #333; }
   .btn-primary:disabled { background: #999; cursor: not-allowed; }
-  .btn-secondary { background: var(--white); color: var(--black); border: 1.5px solid var(--gray-200); }
-  .btn-secondary:hover { border-color: var(--black); }
-  .btn-success { background: #1a7a4a; color: var(--white); }
+  .btn-success { background: var(--green); color: var(--white); }
   .btn-success:hover { background: #156040; }
   .btn-success:disabled { background: #999; cursor: not-allowed; }
-  .btn-copy { background: var(--gray-100); color: var(--black); border: 1.5px solid var(--gray-200); font-size: 12px; padding: 7px 14px; }
-  .btn-copy:hover { background: var(--gray-200); }
+  .btn-secondary { background: var(--white); color: var(--black); border: 1.5px solid var(--gray-200); }
+  .btn-secondary:hover { border-color: var(--black); }
   .status { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: var(--radius); font-size: 13px; margin-top: 14px; }
-  .status.success { background: #e6f4ea; color: #1a7a4a; }
+  .status.success { background: #e6f4ea; color: var(--green); }
   .status.error { background: #fce8e6; color: #c5221f; }
   .status.loading { background: #fff8e1; color: #856404; }
+  .status.info { background: #e8f0fe; color: #1a56a0; }
   .spinner { width: 16px; height: 16px; border: 2px solid currentColor; border-top-color: transparent; border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .result-block { margin-top: 12px; border: 1.5px solid var(--gray-200); border-radius: var(--radius); overflow: hidden; }
-  .result-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--gray-100); border-bottom: 1px solid var(--gray-200); }
-  .result-label { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gray-600); }
-  .result-content { padding: 14px; font-size: 14px; line-height: 1.6; white-space: pre-wrap; max-height: 200px; overflow-y: auto; background: var(--white); }
   .divider { height: 1px; background: var(--gray-200); margin: 20px 0; }
-  .product-preview { display: flex; gap: 16px; align-items: flex-start; padding: 14px; background: var(--gray-100); border-radius: var(--radius); margin-bottom: 18px; }
-  .product-preview img { width: 80px; height: 80px; object-fit: cover; border-radius: 6px; flex-shrink: 0; border: 1px solid var(--gray-200); }
-  .product-preview .name { font-weight: 500; font-size: 14px; margin-bottom: 6px; line-height: 1.4; }
-  .product-preview .meta { font-size: 12px; color: var(--gray-600); line-height: 1.8; }
   .note { font-size: 12px; color: var(--gray-400); margin-top: 6px; }
-  .action-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
   .field-label { font-size: 12px; font-weight: 500; color: var(--gray-600); margin-bottom: 6px; }
-  /* Variantes prix */
-  .mult-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
-  .mult-input { width: 80px !important; }
-  .variants-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13px; }
-  .variants-table th { text-align: left; padding: 8px 10px; background: var(--gray-100); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gray-600); border-bottom: 2px solid var(--gray-200); }
-  .variants-table td { padding: 8px 10px; border-bottom: 1px solid var(--gray-200); vertical-align: middle; }
-  .variants-table tr:last-child td { border-bottom: none; }
-  .price-input-small { width: 90px !important; padding: 6px 8px !important; font-size: 13px !important; text-align: right; }
-  .sale-price-cell { font-weight: 600; color: var(--black); }
-
-  .img-card { width: 160px; background: var(--white); border: 1.5px solid var(--gray-200); border-radius: var(--radius); overflow: hidden; font-size: 11px; }
-  .img-card img { width: 100%; height: 110px; object-fit: cover; display: block; }
-  .img-card .img-footer { padding: 8px; display: flex; flex-direction: column; gap: 5px; }
-  .img-card .img-label { font-size: 11px; font-weight: 600; text-align: center; padding: 3px 6px; border-radius: 4px; }
-  .img-card .img-label.english { background: #fce8e6; color: #c5221f; }
-  .img-card .img-label.clean { background: #e6f4ea; color: #1a7a4a; }
-  .img-card .img-label.checking { background: #fff8e1; color: #856404; }
-  .btn-chatgpt { background: #10a37f; color: white; border: none; border-radius: 5px; padding: 5px 8px; font-size: 11px; font-weight: 600; cursor: pointer; width: 100%; text-align: center; text-decoration: none; display: block; }
-  .btn-chatgpt:hover { background: #0d8a6c; }
-  .btn-shopify-upload { background: var(--gray-100); color: var(--black); border: 1.5px solid var(--gray-200); border-radius: 5px; padding: 5px 8px; font-size: 11px; font-weight: 500; cursor: pointer; width: 100%; text-align: center; }
-  .btn-shopify-upload:hover { background: var(--gray-200); }
-  /* OLD img-card styles removed */
-
-  .publish-summary { background: var(--gray-100); border-radius: var(--radius); padding: 16px; margin-top: 14px; }
-
-  .img-card { width: 140px; background: var(--white); border: 1.5px solid var(--gray-200); border-radius: var(--radius); overflow: hidden; font-size: 11px; }
-  .img-card img { width: 100%; height: 100px; object-fit: cover; display: block; }
-  .img-card .img-status { padding: 6px 8px; text-align: center; font-weight: 500; }
-  .img-card.checking .img-status { background: #fff8e1; color: #856404; }
-  .img-card.clean .img-status { background: #e6f4ea; color: #1a7a4a; }
-  .img-card.updating .img-status { background: #e8f0fe; color: #1a56a0; }
-  .img-card.updated .img-status { background: #e6f4ea; color: #1a7a4a; }
-  .img-card.error .img-status { background: #fce8e6; color: #c5221f; }
+  .field-group { margin-bottom: 16px; }
+  /* Product preview */
+  .product-preview { display: flex; gap: 16px; align-items: flex-start; padding: 14px; background: var(--gray-100); border-radius: var(--radius); margin-bottom: 18px; }
+  .product-preview img { width: 90px; height: 90px; object-fit: cover; border-radius: 6px; flex-shrink: 0; }
+  .product-preview .name { font-weight: 500; font-size: 14px; margin-bottom: 4px; line-height: 1.4; }
+  .product-preview .meta { font-size: 12px; color: var(--gray-600); }
+  /* Titre suggestions */
+  .titre-suggestions { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+  .titre-option { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1.5px solid var(--gray-200); border-radius: var(--radius); cursor: pointer; transition: all 0.15s; }
+  .titre-option:hover { border-color: var(--black); background: var(--gray-100); }
+  .titre-option.selected { border-color: var(--black); background: var(--gray-100); }
+  .titre-option input[type="radio"] { flex-shrink: 0; width: 16px; height: 16px; accent-color: var(--black); }
+  .titre-option span { font-size: 14px; line-height: 1.4; }
+  /* Result blocks */
+  .result-box { border: 1.5px solid var(--gray-200); border-radius: var(--radius); overflow: hidden; margin-bottom: 12px; }
+  .result-box-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--gray-100); border-bottom: 1px solid var(--gray-200); }
+  .result-box-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-600); }
+  .result-box-content { padding: 14px; font-size: 14px; line-height: 1.6; }
+  .result-box textarea { border: none; border-radius: 0; padding: 14px; min-height: 100px; font-size: 14px; }
+  .result-box textarea:focus { border: none; box-shadow: none; outline: none; }
+  /* Step indicator */
+  .steps-bar { display: flex; gap: 0; margin-bottom: 24px; }
+  .step-dot { flex: 1; height: 4px; background: var(--gray-200); border-radius: 2px; margin: 0 2px; transition: background 0.3s; }
+  .step-dot.active { background: var(--black); }
+  .step-dot.done { background: var(--green); }
+  /* Action buttons row */
+  .action-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+  /* Publish summary */
+  .publish-summary { background: var(--gray-100); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; }
   .publish-summary .row { display: flex; justify-content: space-between; font-size: 13px; padding: 5px 0; border-bottom: 1px solid var(--gray-200); }
-
-  .img-card { width: 140px; background: var(--white); border: 1.5px solid var(--gray-200); border-radius: var(--radius); overflow: hidden; font-size: 11px; }
-  .img-card img { width: 100%; height: 100px; object-fit: cover; display: block; }
-  .img-card .img-status { padding: 6px 8px; text-align: center; font-weight: 500; }
-  .img-card.checking .img-status { background: #fff8e1; color: #856404; }
-  .img-card.clean .img-status { background: #e6f4ea; color: #1a7a4a; }
-  .img-card.updating .img-status { background: #e8f0fe; color: #1a56a0; }
-  .img-card.updated .img-status { background: #e6f4ea; color: #1a7a4a; }
-  .img-card.error .img-status { background: #fce8e6; color: #c5221f; }
   .publish-summary .row:last-child { border-bottom: none; }
-
-  .img-card { width: 140px; background: var(--white); border: 1.5px solid var(--gray-200); border-radius: var(--radius); overflow: hidden; font-size: 11px; }
-  .img-card img { width: 100%; height: 100px; object-fit: cover; display: block; }
-  .img-card .img-status { padding: 6px 8px; text-align: center; font-weight: 500; }
-  .img-card.checking .img-status { background: #fff8e1; color: #856404; }
-  .img-card.clean .img-status { background: #e6f4ea; color: #1a7a4a; }
-  .img-card.updating .img-status { background: #e8f0fe; color: #1a56a0; }
-  .img-card.updated .img-status { background: #e6f4ea; color: #1a7a4a; }
-  .img-card.error .img-status { background: #fce8e6; color: #c5221f; }
   .publish-summary .row span:first-child { color: var(--gray-600); }
-
-  .img-card { width: 140px; background: var(--white); border: 1.5px solid var(--gray-200); border-radius: var(--radius); overflow: hidden; font-size: 11px; }
-  .img-card img { width: 100%; height: 100px; object-fit: cover; display: block; }
-  .img-card .img-status { padding: 6px 8px; text-align: center; font-weight: 500; }
-  .img-card.checking .img-status { background: #fff8e1; color: #856404; }
-  .img-card.clean .img-status { background: #e6f4ea; color: #1a7a4a; }
-  .img-card.updating .img-status { background: #e8f0fe; color: #1a56a0; }
-  .img-card.updated .img-status { background: #e6f4ea; color: #1a7a4a; }
-  .img-card.error .img-status { background: #fce8e6; color: #c5221f; }
   .publish-summary .row span:last-child { font-weight: 500; }
 </style>
 </head>
@@ -118,121 +82,140 @@
 
 <header>
   <div class="logo">AutoFiche</div>
-  
 </header>
 
 <div class="container">
 
-  <!-- ÉTAPE 1 -->
-  <div class="card">
+  <!-- Barre de progression -->
+  <div class="steps-bar">
+    <div class="step-dot active" id="dot0"></div>
+    <div class="step-dot" id="dot1"></div>
+    <div class="step-dot" id="dot2"></div>
+    <div class="step-dot" id="dot3"></div>
+    <div class="step-dot" id="dot4"></div>
+    <div class="step-dot" id="dot5"></div>
+  </div>
+
+  <!-- ÉTAPE 0 : Charger produit -->
+  <div class="card" id="card0">
     <div class="step-label">Étape 1</div>
     <div class="step-title">Lien produit Shopify</div>
     <div class="input-row">
-      <input type="url" id="shopifyUrl" placeholder="https://admin.shopify.com/store/luminaire-essenza-2/products/123456789" />
+      <input type="url" id="shopifyUrl" placeholder="https://admin.shopify.com/store/luminaire-essenza-2/products/..." />
       <button class="btn btn-primary" onclick="loadProduct()">Charger →</button>
     </div>
     <p class="note">Colle le lien depuis ton admin Shopify après avoir pushé depuis DSers</p>
-    <div id="loadStatus"></div>
+    <div id="status0"></div>
   </div>
 
-  <!-- ÉTAPE 2 : Produit + Prix par variante -->
-  <div class="card" id="productCard" style="display:none">
+  <!-- ÉTAPE 1 : Titre -->
+  <div class="card disabled" id="card1">
     <div class="step-label">Étape 2</div>
-    <div class="step-title">Produit chargé — Prix par variante</div>
-    <div id="productPreview"></div>
-
-    <div class="mult-row">
-      <span class="field-label" style="margin-bottom:0">Multiplicateur ×</span>
-      <input type="number" id="multiplier" class="mult-input" value="3" min="1" max="20" step="0.5" oninput="rebuildVariantTable()" onchange="rebuildVariantTable()" />
-      <span style="font-size:12px;color:var(--gray-400)">Appliqué à tous les prix fournisseurs</span>
-    </div>
-
-    <div class="field-label">Prix fournisseur par variante (depuis AliExpress)</div>
-    <table class="variants-table">
-      <thead>
-        <tr>
-          <th>Variante</th>
-          <th style="text-align:right">Prix fournisseur (€)</th>
-          <th style="text-align:right">Prix de vente</th>
-        </tr>
-      </thead>
-      <tbody id="variantPriceRows"></tbody>
-    </table>
-
-    <div class="divider"></div>
-    <button class="btn btn-primary" onclick="generateContent()">Générer la fiche en français →</button>
-  </div>
-
-  <!-- ÉTAPE 3 : Résultats -->
-  <div class="card" id="contentCard" style="display:none">
-    <div class="step-label">Étape 3</div>
-    <div class="step-title">Fiche produit générée</div>
-    <div id="generateStatus"></div>
-
-    <div id="generatedContent" style="display:none">
-
-      <div class="result-block">
-        <div class="result-header"><span class="result-label">Titre</span><button class="btn btn-copy" onclick="copyField('titleOutput',this)">Copier</button></div>
-        <div class="result-content" id="titleOutput"></div>
+    <div class="step-title">Génération du titre</div>
+    <div id="productPreview1"></div>
+    <div id="status1"></div>
+    <div id="titreContent" style="display:none">
+      <div class="field-label" style="margin-bottom:10px">Suggestions de titre — choisis ou modifie :</div>
+      <div class="titre-suggestions" id="titreSuggestions"></div>
+      <div class="field-group">
+        <div class="field-label">Ton titre final (modifiable)</div>
+        <input type="text" id="titreFinal" placeholder="Modifie ou écris ton titre ici..." />
       </div>
-
-      <div class="result-block">
-        <div class="result-header"><span class="result-label">Description principale</span><button class="btn btn-copy" onclick="copyField('descOutput',this)">Copier</button></div>
-        <div class="result-content" id="descOutput"></div>
-      </div>
-
-      <div class="result-block">
-        <div class="result-header"><span class="result-label">Tableau caractéristiques (HTML)</span><button class="btn btn-copy" onclick="copyField('specsOutput',this)">Copier</button></div>
-        <div class="result-content" id="specsOutput"></div>
-      </div>
-
-      <div class="result-block">
-        <div class="result-header"><span class="result-label">Bloc 1 — Attachement émotionnel</span><button class="btn btn-copy" onclick="copyField('bloc1Output',this)">Copier</button></div>
-        <div class="result-content" id="bloc1Output"></div>
-      </div>
-
-      <div class="result-block">
-        <div class="result-header"><span class="result-label">Bloc 2 — Objections & FAQ</span><button class="btn btn-copy" onclick="copyField('bloc2Output',this)">Copier</button></div>
-        <div class="result-content" id="bloc2Output"></div>
-      </div>
-
-      <div class="result-block">
-        <div class="result-header"><span class="result-label">Bloc 3 — Qualité & Valeur</span><button class="btn btn-copy" onclick="copyField('bloc3Output',this)">Copier</button></div>
-        <div class="result-content" id="bloc3Output"></div>
-      </div>
-
-      <div class="result-block">
-        <div class="result-header"><span class="result-label">SEO Title + Meta Description</span><button class="btn btn-copy" onclick="copyField('seoOutput',this)">Copier</button></div>
-        <div class="result-content" id="seoOutput"></div>
-      </div>
-
-      <div class="result-block">
-        <div class="result-header"><span class="result-label">Variantes traduites en français</span><button class="btn btn-copy" onclick="copyField('variantsOutput',this)">Copier</button></div>
-        <div class="result-content" id="variantsOutput"></div>
-      </div>
-
-      <div class="divider"></div>
-      <div class="step-label" style="margin-bottom:12px">Publier sur Shopify</div>
-      <div class="publish-summary" id="publishSummary"></div>
       <div class="action-row">
-        <button class="btn btn-success" id="publishBtn" onclick="publishToShopify()">✓ Mettre à jour Shopify →</button>
-        <button class="btn btn-secondary" onclick="copyAll()">Tout copier</button>
+        <button class="btn btn-success" onclick="validerTitre()">Valider ce titre →</button>
       </div>
-      <div id="publishStatus"></div>
-
     </div>
   </div>
 
-  <!-- ÉTAPE 4 : Images -->
-  <div class="card" id="imagesCard" style="display:none">
-    <div class="step-label">Étape 4 (optionnelle)</div>
-    <div class="step-title">Images à corriger</div>
-    <p style="font-size:13px;color:var(--gray-600);margin-bottom:16px">
-      Clique sur <strong>ChatGPT →</strong> sous chaque image avec du texte anglais. 
-      ChatGPT s'ouvre avec le prompt pré-rempli — tu colles l'image, valides, récupères l'image corrigée et l'uploades sur Shopify.
-    </p>
-    <div id="imagesGrid" style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:16px"></div>
-    <div id="imagesStatus"></div>
+  <!-- ÉTAPE 2 : Description -->
+  <div class="card disabled" id="card2">
+    <div class="step-label">Étape 3</div>
+    <div class="step-title">Génération de la description</div>
+    <div id="status2"></div>
+    <div id="descContent" style="display:none">
+      <div class="result-box">
+        <div class="result-box-header">
+          <span class="result-box-label">Description (2 paragraphes)</span>
+        </div>
+        <textarea id="descOutput" rows="6" style="width:100%;border:none;padding:14px;font-size:14px;line-height:1.6;resize:vertical"></textarea>
+      </div>
+      <div class="action-row">
+        <button class="btn btn-success" onclick="validerDescription()">Valider cette description →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 3 : Tableau -->
+  <div class="card disabled" id="card3">
+    <div class="step-label">Étape 4</div>
+    <div class="step-title">Génération du tableau caractéristiques</div>
+    <div id="status3"></div>
+    <div id="tableauContent" style="display:none">
+      <div class="result-box">
+        <div class="result-box-header">
+          <span class="result-box-label">Tableau HTML</span>
+        </div>
+        <textarea id="tableauOutput" rows="8" style="width:100%;border:none;padding:14px;font-size:13px;line-height:1.6;resize:vertical;font-family:monospace"></textarea>
+      </div>
+      <div class="action-row">
+        <button class="btn btn-success" onclick="validerTableau()">Valider le tableau →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 4 : 3 Blocs -->
+  <div class="card disabled" id="card4">
+    <div class="step-label">Étape 5</div>
+    <div class="step-title">Génération des 3 blocs</div>
+    <div id="status4"></div>
+    <div id="blocsContent" style="display:none">
+      <div class="field-group">
+        <div class="field-label">Titre 1</div>
+        <input type="text" id="titre1Output" />
+      </div>
+      <div class="field-group">
+        <div class="field-label">Texte 1</div>
+        <textarea id="texte1Output" rows="4"></textarea>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Titre 2</div>
+        <input type="text" id="titre2Output" />
+      </div>
+      <div class="field-group">
+        <div class="field-label">Texte 2</div>
+        <textarea id="texte2Output" rows="5"></textarea>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Titre 3</div>
+        <input type="text" id="titre3Output" />
+      </div>
+      <div class="field-group">
+        <div class="field-label">Texte 3</div>
+        <textarea id="texte3Output" rows="4"></textarea>
+      </div>
+      <div class="action-row">
+        <button class="btn btn-success" onclick="validerBlocs()">Valider les blocs →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 5 : Confirmer & Publier -->
+  <div class="card disabled" id="card5">
+    <div class="step-label">Étape 6</div>
+    <div class="step-title">Confirmer et publier</div>
+    <div class="publish-summary" id="publishSummary"></div>
+    <div class="field-group">
+      <div class="field-label">Prix fournisseur (€)</div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <input type="number" id="supplierPrice" step="0.01" placeholder="ex: 12.50" style="max-width:150px" oninput="updatePrixVente()" />
+        <span style="font-size:13px;color:var(--gray-600)">× 3 =</span>
+        <strong id="prixVente" style="font-size:18px">— €</strong>
+      </div>
+    </div>
+    <div class="action-row">
+      <button class="btn btn-success" id="publishBtn" onclick="publierSurShopify()">✓ Publier sur Shopify →</button>
+    </div>
+    <div id="status5"></div>
   </div>
 
 </div>
@@ -240,494 +223,413 @@
 <script>
 const SERVER = 'https://autofiche-server.vercel.app';
 const PROXY = SERVER + '/api/shopify';
-let currentProduct = null;
-let generatedData = {};
+// Clé OpenAI gérée côté serveur Vercel
 
-// ── CHARGER ───────────────────────────────────────────────────
+// État global
+let currentProduct = null;
+let titreFinal = '';
+let descriptionFinale = '';
+let tableauFinal = '';
+let blocsFinaux = {};
+let gptHistory = []; // Historique de conversation GPT-4o
+
+// ── HELPERS ───────────────────────────────────────────────────
+function showStatus(id, type, html) {
+  const icons = { loading: '<div class="spinner"></div>', success: '✓', error: '✗', info: 'ℹ' };
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = `<div class="status ${type}">${icons[type]} <span>${html}</span></div>`;
+}
+
+function enableCard(n) {
+  document.getElementById(`card${n}`).classList.remove('disabled');
+  setDot(n, 'active');
+  setTimeout(() => document.getElementById(`card${n}`).scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
+}
+
+function setDot(n, state) {
+  const dot = document.getElementById(`dot${n}`);
+  if (dot) { dot.className = 'step-dot ' + state; }
+}
+
+function updatePrixVente() {
+  const s = parseFloat(document.getElementById('supplierPrice').value) || 0;
+  document.getElementById('prixVente').textContent = s > 0 ? (s * 3).toFixed(2) + ' €' : '— €';
+}
+
+// ── GPT-4o (avec historique de conversation) ──────────────────
+async function gptChat(newMessages) {
+  // Ajouter les nouveaux messages à l'historique
+  for (const msg of newMessages) {
+    gptHistory.push(msg);
+  }
+
+  const res = await fetch(SERVER + '/api/gpt', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'gpt-4o',
+      max_tokens: 2000,
+      messages: gptHistory
+    })
+  });
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error?.message || 'GPT error');
+
+  const reply = data.choices[0].message.content;
+  // Ajouter la réponse de GPT à l'historique
+  gptHistory.push({ role: 'assistant', content: reply });
+  return reply;
+}
+
+// ── ÉTAPE 0 : Charger produit ─────────────────────────────────
 async function loadProduct() {
   const url = document.getElementById('shopifyUrl').value.trim();
   const match = url.match(/products\/(\d+)/);
-  if (!match) { showStatus('loadStatus','error','URL invalide.'); return; }
-  showStatus('loadStatus','loading','Chargement du produit...');
+  if (!match) { showStatus('status0', 'error', 'URL invalide.'); return; }
+
+  showStatus('status0', 'loading', 'Chargement du produit...');
   try {
     const res = await fetch(`${PROXY}/products/${match[1]}.json`);
     if (!res.ok) throw new Error(`Erreur ${res.status}`);
     const data = await res.json();
     currentProduct = data.product;
-    renderProduct(currentProduct);
-    document.getElementById('productCard').style.display = 'block';
-    showStatus('loadStatus','success','✓ Produit chargé.');
-    setTimeout(() => document.getElementById('productCard').scrollIntoView({behavior:'smooth'}), 200);
-  } catch(e) { showStatus('loadStatus','error',`Erreur : ${e.message}`); }
+
+    showStatus('status0', 'success', '✓ Produit chargé — passage à la génération du titre.');
+    setDot(0, 'done');
+    enableCard(1);
+    startTitre();
+  } catch(e) {
+    showStatus('status0', 'error', 'Erreur : ' + e.message);
+  }
 }
 
-function renderProduct(p) {
+// ── ÉTAPE 1 : Titre ───────────────────────────────────────────
+async function startTitre() {
+  const p = currentProduct;
   const img = p.images?.[0]?.src || '';
-  document.getElementById('productPreview').innerHTML = `
+  const bodyText = (p.body_html || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().substring(0, 800);
+
+  // Afficher preview produit
+  document.getElementById('productPreview1').innerHTML = `
     <div class="product-preview">
       ${img ? `<img src="${img}" onerror="this.style.display='none'" />` : ''}
       <div>
         <div class="name">${p.title}</div>
-        <div class="meta">${p.variants?.length||1} variante(s) · ${p.images?.length||0} image(s) · Statut : ${p.status}</div>
+        <div class="meta">${p.variants?.length || 1} variante(s) · ${p.images?.length || 0} image(s)</div>
       </div>
     </div>`;
-  rebuildVariantTable();
-}
 
-// ── TABLE PRIX PAR VARIANTE ───────────────────────────────────
-function rebuildVariantTable() {
-  if (!currentProduct) return;
-  const mult = parseFloat(document.getElementById('multiplier').value) || 3;
-  const tbody = document.getElementById('variantPriceRows');
-  const p = currentProduct;
+  showStatus('status1', 'loading', 'GPT-4o génère des suggestions de titre...');
 
-  // Grouper par option principale si > 5 variantes
-  const variants = p.variants || [];
-  tbody.innerHTML = variants.map((v, i) => {
-    const currentSupplier = getSupplierPrice(i);
-    const sale = currentSupplier > 0 ? (currentSupplier * mult).toFixed(2) : '—';
-    return `<tr>
-      <td style="color:var(--gray-600);font-size:12px">${v.title === 'Default Title' ? 'Unique' : v.title}</td>
-      <td style="text-align:right">
-        <input type="number" class="price-input-small" id="sp_${i}" value="${currentSupplier||''}"
-          placeholder="ex: 8.50" step="0.01" min="0"
-          oninput="updateSalePrice(${i})" onchange="updateSalePrice(${i})" />
-      </td>
-      <td class="sale-price-cell" style="text-align:right" id="sale_${i}">${sale} €</td>
-    </tr>`;
-  }).join('');
-}
+  // Réinitialiser l'historique GPT
+  gptHistory = [];
 
-function getSupplierPrice(i) {
-  const el = document.getElementById(`sp_${i}`);
-  return el ? parseFloat(el.value) || 0 : 0;
-}
+  const scriptTitre = `Voici les infos de mon produit + une image.
 
-function updateSalePrice(i) {
-  const mult = parseFloat(document.getElementById('multiplier').value) || 3;
-  const s = getSupplierPrice(i);
-  const el = document.getElementById(`sale_${i}`);
-  if (el) el.textContent = s > 0 ? (s * mult).toFixed(2) + ' €' : '— €';
-}
+Fais moi un titre à partir de ça dans le même style que ça :
+Vase à Fleurs Scandinave Blanc | Effet Marbre
+ou : Applique Murale LED Minimaliste au Design Nordique et Décoratif
 
-// ── GÉNÉRER ───────────────────────────────────────────────────
-async function generateContent() {
-  if (!currentProduct) return;
-  document.getElementById('contentCard').style.display = 'block';
-  document.getElementById('generatedContent').style.display = 'none';
-  showStatus('generateStatus','loading','Claude génère la fiche en français...');
-  setTimeout(() => document.getElementById('contentCard').scrollIntoView({behavior:'smooth'}), 200);
+Utiliser le plus possible cette structure :
+- Mot clé principal
+- Bénéfice
+- Caractéristique (Couleur, Taille..)
 
-  const p = currentProduct;
-  const bodyText = (p.body_html||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim().substring(0,500);
-  const optionNames = p.options?.map(o=>o.name).join(', ')||'';
-  const optionValues = p.options?.map(o=>o.values.join(' / ')).join(' | ')||'';
+Fais court.
 
-  // Détecter le type de produit (luminaire vs vase/déco)
-  const titleLower = p.title.toLowerCase();
-  const bodyLower = bodyText.toLowerCase();
-  const isLuminaire = ['lamp','light','led','applique','plafonnier','lustre','luminaire','chandelier','sconce','fixture','bulb','ampoule','éclairage'].some(k => titleLower.includes(k) || bodyLower.includes(k));
-  const boutique = isLuminaire ? 'Luminaire Essenza' : 'Maison Vase';
-  const style = isLuminaire ? 'épuré, premium, luminaires haut de gamme' : 'chaleureux, élégant, décoration intérieure';
-  const EXPEDITION_IMG = isLuminaire
-    ? '<img src=\"https://cdn.shopify.com/s/files/1/0996/4031/2190/files/partenaire-livraison.webp?v=1781103767\" alt=\"\" width=\"287\" height=\"27\">'
-    : '<img src=\"https://cdn.shopify.com/s/files/1/0878/9069/0314/files/partenaire-livraison.webp?v=1781113601\" alt=\"\" width=\"287\" height=\"27\">';
+Donne moi 3 suggestions de titres numérotées (1. 2. 3.), une par ligne, sans explication.
 
-  const specsTemplate = isLuminaire
-    ? `Pour specs, génère un objet JSON "specs_luminaire" avec ces clés (mets "Pas d'info" si inconnu): nb_lumieres, ampoule_incluse (Oui/Non), type_ampoule, materiaux, tension, zone_eclairage, couleur_lumiere, forme, dimensions, finition, source_alim, dimmable (Oui/Non), style_design, couleur, ideale_pour`
-    : `Pour specs, génère un objet JSON "specs_vase" avec ces clés (mets "Pas d'info" si inconnu): materiaux, dimensions, couleur, style, ideale_pour, entretien`;
-
-  const prompt = `Tu es expert copywriting e-commerce pour "${boutique}", style ${style}.
-
-Produit AliExpress :
-- Titre : ${p.title}
-- Description : ${bodyText}
-- Options : ${optionNames} → ${optionValues}
-- Type : ${isLuminaire ? 'LUMINAIRE' : 'VASE/DÉCO'}
-
-IMPORTANT : génère un JSON COMPLET avec TOUS les champs. Ne coupe jamais le JSON.
-
-Structure titre (OBLIGATOIRE) :
-1. Mot clé principal
-2. Bénéfice
-3. Caractéristique
-4. Marque optionnelle
-
-${specsTemplate}
-
-JSON COMPLET OBLIGATOIRE (tous les champs requis, aucun ne doit être vide) :
-{
-  "titre": "Mot clé | Bénéfice | Caractéristique",
-  "description": "2 paragraphes **gras** sur mots clés, ton humain, JAMAIS: garanti/offert/offrant",
-  ${isLuminaire
-    ? '"specs_luminaire": {"nb_lumieres":"VAL","ampoule_incluse":"Oui/Non","type_ampoule":"VAL","materiaux":"VAL","tension":"VAL","zone_eclairage":"VAL","couleur_lumiere":"VAL","forme":"VAL","dimensions":"VAL","finition":"VAL","source_alim":"VAL","dimmable":"Oui/Non","style_design":"VAL","couleur":"VAL","ideale_pour":"VAL"}'
-    : '"specs_vase": {"materiaux":"VAL","dimensions":"VAL","couleur":"VAL","style":"VAL","ideale_pour":"VAL","entretien":"VAL"}'
-  },
-  "bloc1_titre": "Titre court et percutant",
-  "bloc1_desc": "4-5 lignes impact quotidien SANS bullets. Ce champ est OBLIGATOIRE et doit être rempli.",
-  "bloc2_titre": "Titre questions/objections",
-  "bloc2_desc": "Bullets • Question ? Réponse. Ce champ est OBLIGATOIRE et doit être rempli.",
-  "bloc3_titre": "Question rhétorique ?",
-  "bloc3_desc": "3-4 lignes qualité valeur. Ce champ est OBLIGATOIRE et doit être rempli.",
-  "seo_title": "60 chars max SEO",
-  "seo_desc": "155 chars max conversion",
-  "variants_fr": [{"name":"NomOptionFR","values":["val1FR","val2FR"]}]
-}
-
-Règles traduction variantes (OBLIGATOIRE - ne jamais laisser en anglais) :
-Warm White→Blanc Chaud, Cold White→Blanc Froid, Silver→Argent, Black→Noir, White→Blanc, Gold→Doré, Color→Couleur, Size→Taille, Sensor→Avec Détecteur, NO Sensor→Sans Détecteur, Small→Petit, Medium→Moyen, Large→Grand, Emitting Color→Couleur d'Émission`
+Titre du produit : ${p.title}
+Description : ${bodyText}`;
 
   try {
-    const res = await fetch(SERVER + '/api/claude', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({model:'claude-haiku-4-5-20251001', max_tokens:2000, messages:[{role:'user',content:prompt}]})
-    });
-    const rawText = await res.text();
-    let data;
-    try { data = JSON.parse(rawText); }
-    catch(e) { throw new Error('Serveur: ' + rawText.substring(0,200)); }
-
-    let text = '';
-    if (data.content && Array.isArray(data.content)) {
-      text = data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
-    } else if (data.error) {
-      throw new Error(data.error.message || JSON.stringify(data.error));
+    const messages = [];
+    if (img) {
+      messages.push({
+        role: 'user',
+        content: [
+          { type: 'image_url', image_url: { url: img, detail: 'low' } },
+          { type: 'text', text: scriptTitre }
+        ]
+      });
     } else {
-      throw new Error('Réponse inattendue: ' + JSON.stringify(data).substring(0,200));
+      messages.push({ role: 'user', content: scriptTitre });
     }
 
-    generatedData = JSON.parse(text.replace(/```json|```/g,'').trim());
+    const reply = await gptChat(messages);
 
-    // Construire le tableau HTML selon le type de produit
-    const EXPEDITION = generatedData.specs_luminaire
-      ? '<img src="https://cdn.shopify.com/s/files/1/0996/4031/2190/files/partenaire-livraison.webp?v=1781103767" alt="" width="287" height="27">'
-      : '<img src="https://cdn.shopify.com/s/files/1/0878/9069/0314/files/partenaire-livraison.webp?v=1781113601" alt="" width="287" height="27">';
+    // Parser les suggestions
+    const lines = reply.split('\n').filter(l => l.match(/^\d+\./)).map(l => l.replace(/^\d+\.\s*/, '').trim());
 
-    let specsHtml = '';
-    if (generatedData.specs_luminaire) {
-      const s = generatedData.specs_luminaire;
-      specsHtml = `<p><strong>Caractéristiques principales :</strong></p>
-<table width="100%" style="width:100.088%"><tbody>
-<tr><td style="width:31.8145%">Nombre de lumières</td><td style="width:67.8243%">${s.nb_lumieres||"Pas d'info"}</td></tr>
-<tr><td>Ampoule incluse</td><td>${s.ampoule_incluse||"Pas d'info"}</td></tr>
-<tr><td>Type d'ampoule</td><td>${s.type_ampoule||"Pas d'info"}</td></tr>
-<tr><td>Matériaux</td><td>${s.materiaux||"Pas d'info"}</td></tr>
-<tr><td>Tension</td><td>${s.tension||"Pas d'info"}</td></tr>
-<tr><td>Zone d'éclairage</td><td>${s.zone_eclairage||"Pas d'info"}</td></tr>
-<tr><td>Couleur de la lumière</td><td>${s.couleur_lumiere||"Pas d'info"}</td></tr>
-<tr><td>Forme</td><td>${s.forme||"Pas d'info"}</td></tr>
-<tr><td>Dimensions de l'article</td><td>${s.dimensions||"Pas d'info"}</td></tr>
-<tr><td>Finition</td><td>${s.finition||"Pas d'info"}</td></tr>
-</tbody></table>
-<p style="margin-top:30px"><strong>Informations supplémentaires :</strong></p>
-<table width="100%" style="width:100.088%"><tbody>
-<tr><td style="width:31.9893%">Source d'alimentation</td><td style="width:67.8243%">${s.source_alim||"Pas d'info"}</td></tr>
-<tr><td>Dimmable</td><td>${s.dimmable||"Pas d'info"}</td></tr>
-<tr><td>Style</td><td>${s.style_design||"Pas d'info"}</td></tr>
-<tr><td>Couleur</td><td>${s.couleur||"Pas d'info"}</td></tr>
-<tr><td>Ampoule</td><td>${s.type_ampoule||"Pas d'info"}</td></tr>
-<tr><td>Idéale pour</td><td>${s.ideale_pour||"Pas d'info"}</td></tr>
-<tr><td>Délai de traitement</td><td>1 à 2 jours (Du Lundi au Dimanche)</td></tr>
-<tr><td>Délai de livraison</td><td>6 à 8 jours (Du Lundi au Vendredi)</td></tr>
-<tr><td>Expédition via</td><td>${EXPEDITION}</td></tr>
-</tbody></table>`;
-    } else {
-      const s = generatedData.specs_vase || {};
-      specsHtml = `<p><strong>Caractéristiques principales :</strong></p>
-<table width="100%" style="width:100.088%"><tbody>
-<tr><td style="width:31.7867%">Matériaux</td><td style="width:67.983%">${s.materiaux||"Pas d'info"}</td></tr>
-<tr><td>Dimensions</td><td>${s.dimensions||"Pas d'info"}</td></tr>
-<tr><td>Couleur</td><td>${s.couleur||"Pas d'info"}</td></tr>
-<tr><td>Style</td><td>${s.style||"Pas d'info"}</td></tr>
-</tbody></table>
-<p style="margin-top:30px"><strong>Informations supplémentaires :</strong></p>
-<table width="100%" style="width:100.088%; overflow:hidden"><tbody>
-<tr><td style="width:31.7882%">Idéale pour</td><td style="width:67.9814%">${s.ideale_pour||"Pas d'info"}</td></tr>
-<tr><td>Entretien</td><td>${s.entretien||"Pas d'info"}</td></tr>
-<tr><td>Délai de traitement</td><td>1 à 2 jours (Du Lundi au Dimanche)</td></tr>
-<tr><td>Délai de livraison</td><td>6 à 8 jours (Du Lundi au Vendredi)</td></tr>
-<tr><td>Expédition via</td><td>${EXPEDITION}</td></tr>
-</tbody></table>`;
-    }
-    generatedData.specs_html = specsHtml;
+    if (lines.length === 0) throw new Error('Pas de suggestions parsées');
 
-        document.getElementById('titleOutput').textContent = generatedData.titre||'';
-    document.getElementById('descOutput').textContent = generatedData.description||'';
-    document.getElementById('specsOutput').textContent = specsHtml;
-    document.getElementById('bloc1Output').textContent = (generatedData.bloc1_titre||'') + '\n\n' + (generatedData.bloc1_desc||'');
-    document.getElementById('bloc2Output').textContent = (generatedData.bloc2_titre||'') + '\n\n' + (generatedData.bloc2_desc||'');
-    document.getElementById('bloc3Output').textContent = (generatedData.bloc3_titre||'') + '\n\n' + (generatedData.bloc3_desc||'');
-    document.getElementById('seoOutput').textContent = `SEO Title: ${generatedData.seo_title||''}\n\nMeta Description: ${generatedData.seo_desc||''}`;
-    document.getElementById('variantsOutput').textContent = JSON.stringify(generatedData.variants_fr||[], null, 2);
+    // Afficher les suggestions
+    const suggestionsEl = document.getElementById('titreSuggestions');
+    suggestionsEl.innerHTML = lines.map((t, i) => `
+      <label class="titre-option" onclick="selectTitre('${t.replace(/'/g, "\\'")}')">
+        <input type="radio" name="titreRadio" value="${i}" ${i === 0 ? 'checked' : ''} />
+        <span>${t}</span>
+      </label>`).join('');
 
-    updatePublishSummary();
-    document.getElementById('generatedContent').style.display = 'block';
-    showStatus('generateStatus','success','✓ Fiche générée — vérifie avant de publier.');
-    showImagesCard();
+    // Pré-remplir le champ titre final avec la 1ère suggestion
+    document.getElementById('titreFinal').value = lines[0];
+
+    document.getElementById('titreContent').style.display = 'block';
+    showStatus('status1', 'success', '✓ Suggestions générées — choisis ou modifie ton titre.');
+
   } catch(e) {
-    showStatus('generateStatus','error','Erreur : ' + e.message);
+    showStatus('status1', 'error', 'Erreur : ' + e.message);
   }
 }
 
-// ── RÉSUMÉ ────────────────────────────────────────────────────
-function updatePublishSummary() {
-  const titre = generatedData.titre||'—';
-  const el = document.getElementById('publishSummary');
-  if (!el) return;
-  const mult = parseFloat(document.getElementById('multiplier').value)||3;
-  const variants = currentProduct?.variants||[];
-  const priceRange = variants.map((_,i) => {
-    const s = getSupplierPrice(i);
-    return s > 0 ? (s*mult).toFixed(2) : null;
-  }).filter(Boolean);
-  const priceStr = priceRange.length > 0
-    ? (priceRange.length === 1 ? priceRange[0]+' €' : `${Math.min(...priceRange.map(Number))} — ${Math.max(...priceRange.map(Number))} €`)
-    : 'non défini';
-  el.innerHTML = `
-    <div class="row"><span>Titre</span><span>${titre.substring(0,55)}${titre.length>55?'...':''}</span></div>
-    <div class="row"><span>Prix de vente</span><span>${priceStr}</span></div>
-    <div class="row"><span>Variantes</span><span>${variants.length} variante(s)</span></div>
+function selectTitre(titre) {
+  document.getElementById('titreFinal').value = titre;
+}
+
+async function validerTitre() {
+  titreFinal = document.getElementById('titreFinal').value.trim();
+  if (!titreFinal) { alert('Entre un titre.'); return; }
+
+  setDot(1, 'done');
+  enableCard(2);
+  startDescription();
+}
+
+// ── ÉTAPE 2 : Description ─────────────────────────────────────
+async function startDescription() {
+  showStatus('status2', 'loading', 'GPT-4o génère la description...');
+
+  const scriptDesc = `Fais moi une description pour ce produit optimisé pour inciter à l'achat (Max 2 paragraphes et en gras les éléments importants).
+Innove un peu (ne met pas le mot garanti, ni le mot offert ou offrant ou qui contient ce mot).
+Change totalement le style.
+Il faut pas que ça fasse trop robot.
+Fais court et il faut qu'on retrouve les éléments importants du titre aussi dans la description.
+Il faut aussi que on parle direct de ce que le client aura comme bénéfice avec ça.
+
+Dans ce style (adapte à la niche du produit) :
+"Oubliez les luminaires fades et impersonnels. Cette Applique Nordique Décorative ne se contente pas d'éclairer — elle donne une âme à votre pièce. Lumière douce, design élégant noir ou or, effet haut de gamme immédiat… c'est le petit détail qui rend votre intérieur inoubliable.
+Conçue en métal plaqué haute durabilité et certifiée CE – la même qualité utilisée dans les hôtels haut de gamme."`;
+
+  try {
+    // D'abord envoyer le titre validé
+    const reply = await gptChat([
+      { role: 'user', content: `ok voici mon titre final : ${titreFinal}` },
+      { role: 'user', content: scriptDesc }
+    ]);
+
+    document.getElementById('descOutput').value = reply;
+    document.getElementById('descContent').style.display = 'block';
+    showStatus('status2', 'success', '✓ Description générée — modifie si besoin puis valide.');
+
+  } catch(e) {
+    showStatus('status2', 'error', 'Erreur : ' + e.message);
+  }
+}
+
+function validerDescription() {
+  descriptionFinale = document.getElementById('descOutput').value.trim();
+  if (!descriptionFinale) { alert('La description est vide.'); return; }
+  setDot(2, 'done');
+  enableCard(3);
+  startTableau();
+}
+
+// ── ÉTAPE 3 : Tableau ─────────────────────────────────────────
+async function startTableau() {
+  showStatus('status3', 'loading', 'GPT-4o génère le tableau caractéristiques...');
+
+  const scriptTableau = `Prend toutes les infos que tu connais de ce produit et remplace les valeurs correctes dans le tableau suivant. Donne le moi sous la même forme HTML exacte. Toujours inclure (Du Lundi au Dimanche) et (Du Lundi au Vendredi).
+
+Si une info n'est pas disponible, mets "Pas d'info".
+
+Renvoie UNIQUEMENT le HTML du tableau, rien d'autre.
+
+<p><strong>Caractéristiques principales :</strong></p>
+<table width="100%" style="width: 100.088%; height: 352.688px;">
+<tbody>
+<tr style="height: 19.5938px;"><td style="width: 31.8145%; height: 19.5938px;"><div><span style="font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; font-size: 0.875rem;">Nombre de lumières</span></div></td><td style="width: 67.8243%; height: 19.5938px;"><div><span style="font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; font-size: 0.875rem;">VALEUR</span></div></td></tr>
+<tr style="height: 19.5938px;"><td style="width: 31.8145%; height: 19.5938px;"><div><span style="font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; font-size: 0.875rem;">Puissance</span></div></td><td style="width: 67.8243%; height: 19.5938px;">VALEUR</td></tr>
+<tr style="height: 19.5938px;"><td style="width: 31.8145%; height: 19.5938px;"><div><span style="font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; font-size: 0.875rem;">Matériaux</span></div></td><td style="width: 67.8243%; height: 19.5938px;"><div><span style="font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; font-size: 0.875rem;">VALEUR</span></div></td></tr>
+<tr style="height: 19.5938px;"><td style="width: 31.8145%; height: 19.5938px;"><div><span style="font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; font-size: 0.875rem;">Tension</span></div></td><td style="width: 67.8243%; height: 19.5938px;"><div><span style="font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; font-size: 0.875rem;">VALEUR</span></div></td></tr>
+<tr style="height: 19.5938px;"><td style="width: 31.8145%; height: 19.5938px;"><div><span style="font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; font-size: 0.875rem;">Distance d'éclairage</span></div></td><td style="width: 67.8243%; height: 19.5938px;"><div><span style="font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; font-size: 0.875rem;">VALEUR</span></div></td></tr>
+<tr style="height: 19.5938px;"><td style="width: 31.8145%; height: 19.5938px;"><div><span style="font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; font-size: 0.875rem;">Culot</span></div></td><td style="width: 67.8243%; height: 19.5938px;">VALEUR</td></tr>
+<tr style="height: 19.5938px;"><td style="width: 31.8145%; height: 19.5938px;"><div><span style="font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; font-size: 0.875rem;">Dimensions de l'article</span></div></td><td style="width: 67.8243%; height: 19.5938px;">VALEUR</td></tr>
+<tr style="height: 19.5938px;"><td style="width: 31.8145%; height: 19.5938px;"><div><span style="font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; font-size: 0.875rem;">Dimensions du support</span></div></td><td style="width: 67.8243%; height: 19.5938px;"><div><span style="font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; font-size: 0.875rem;">VALEUR</span></div></td></tr>
+<tr style="height: 19.5938px;"><td style="width: 31.8145%; height: 19.5938px;"><div><span style="font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; font-size: 0.875rem;">Couleur de la lumière</span></div></td><td style="width: 67.8243%; height: 19.5938px;"><div><span style="font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; font-size: 0.875rem;">VALEUR</span></div></td></tr>
+</tbody>
+</table>
+<p> </p>
+<p><strong>Informations supplémentaires :</strong></p>
+<table width="100%" style="width: 100.088%; height: 217px; overflow: hidden;">
+<tbody>
+<tr style="height: 19.5938px;"><td style="width: 31.9893%; height: 19.5938px;"><div><span style="font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; font-size: 0.875rem;">Source d'alimentation</span></div></td><td style="width: 67.8243%; height: 19.5938px;"><div><span style="font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; font-size: 0.875rem;">VALEUR</span></div></td></tr>
+<tr style="height: 19.5938px;"><td style="width: 31.9893%; height: 19.5938px;"><div><span style="font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; font-size: 0.875rem;">Dimmable</span></div></td><td style="width: 67.8243%; height: 19.5938px;">VALEUR</td></tr>
+<tr style="height: 19.5938px;"><td style="width: 31.9893%; height: 19.5938px;"><div><span style="font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; font-size: 0.875rem;">Style</span></div></td><td style="width: 67.8243%; height: 19.5938px;"><div><span style="font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; font-size: 0.875rem;">VALEUR</span></div></td></tr>
+<tr style="height: 19.5938px;"><td style="width: 31.9893%; height: 19.5938px;"><div><span style="font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; font-size: 0.875rem;">Couleur</span></div></td><td style="width: 67.8243%; height: 19.5938px;">VALEUR</td></tr>
+<tr style="height: 36.625px;"><td style="width: 31.9893%;">Ampoule</td><td style="width: 67.8243%;">VALEUR</td></tr>
+<tr style="height: 38.5938px;"><td style="width: 31.9893%; height: 38.5938px;"><div><span style="font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; font-size: 0.875rem;">Idéale pour</span></div></td><td style="width: 67.8243%; height: 38.5938px;"><div><span style="font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; font-size: 0.875rem;">VALEUR</span></div></td></tr>
+<tr style="height: 21.375px;"><td style="width: 31.9893%; height: 21.375px;"><div><span style="font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; font-size: 0.875rem;">Délai de traitement</span></div></td><td style="width: 67.8243%; height: 21.375px;">1 à 2 jours (Du Lundi au Dimanche)</td></tr>
+<tr style="height: 19.5938px;"><td style="width: 31.9893%; height: 19.5938px;"><div><span style="font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; font-size: 0.875rem;">Délai de livraison</span></div></td><td style="width: 67.8243%; height: 19.5938px;">6 à 8 jours (Du Lundi au Vendredi)</td></tr>
+<tr style="height: 40.7344px;"><td style="width: 31.9215%; height: 40.7344px;">Expédition via</td><td style="width: 67.8107%; height: 40.7344px;"><img src="https://cdn.shopify.com/s/files/1/0996/4031/2190/files/partenaire-livraison.webp?v=1781103767" alt="" width="287" height="27"></td></tr>
+</tbody>
+</table>`;
+
+  try {
+    const reply = await gptChat([{ role: 'user', content: scriptTableau }]);
+    // Nettoyer la réponse (enlever les balises markdown si présentes)
+    const clean = reply.replace(/```html|```/g, '').trim();
+    document.getElementById('tableauOutput').value = clean;
+    document.getElementById('tableauContent').style.display = 'block';
+    showStatus('status3', 'success', '✓ Tableau généré — vérifie les valeurs puis valide.');
+  } catch(e) {
+    showStatus('status3', 'error', 'Erreur : ' + e.message);
+  }
+}
+
+function validerTableau() {
+  tableauFinal = document.getElementById('tableauOutput').value.trim();
+  if (!tableauFinal) { alert('Le tableau est vide.'); return; }
+  setDot(3, 'done');
+  enableCard(4);
+  startBlocs();
+}
+
+// ── ÉTAPE 4 : 3 Blocs ─────────────────────────────────────────
+async function startBlocs() {
+  showStatus('status4', 'loading', 'GPT-4o génère les 3 blocs titre + description...');
+
+  const scriptBlocs = `Créez moi 3 blocs Titre + Description pour ce produit en prenant en compte TOUTES les infos que je t'ai données. (ne met pas le mot garanti, ni le mot offert ou offrant ou qui contient ce mot)
+
+Premier bloc : Créer un attachement émotionnel et une vision claire de l'impact du produit sur le quotidien.
+
+Deuxième bloc : Rédige-moi un texte structuré avec des bullet points, mélangeant un format question-réponse implicite et des réponses directes aux objections. Le ton doit être fluide, engageant et orienté conversion. Fais court simple et droit au but.
+
+Troisième bloc : Souligner la qualité et la valeur perçue pour justifier l'investissement (sans parler de prix). Dans le titre du troisième bloc tu peux poser une question pour répondre aux objections indirectement.
+
+Ces trois blocs doivent être courts. Ne te répète pas par rapport à la description précédente. Sois très concis et direct.
+
+Dans ce style :
+"Titre 1 : Ce que cette applique change tout de suite
+Description 1 : Design minimaliste, lumière douce, rendu haut de gamme. Cette applique transforme n'importe quel mur en zone stylée. Elle crée une ambiance cosy sans agresser les yeux. C'est beau, c'est classe, c'est efficace."
+
+"Titre 2 : Ce que vous vous demandez (et qu'on va clarifier)
+Description 2 : • Ça éclaire ? Oui, lumière douce haut/bas, parfaite pour une ambiance chic.
+• C'est quali ? Matériaux premium, finitions nickel. Rien à voir avec les produits cheap.
+• Ça tient ? Solide, certifiée CE. Elle est faite pour durer.
+• Facile à installer ? 2 vis, c'est posé."
+
+"Titre 3 : Pourquoi c'est un bon choix
+Description 3 : Elle est belle, fiable et vous simplifie la vie. C'est un choix simple pour sublimer votre intérieur."
+
+Renvoie EXACTEMENT sous ce format JSON sans markdown :
+{"titre1":"...","texte1":"...","titre2":"...","texte2":"...","titre3":"...","texte3":"..."}`;
+
+  try {
+    const reply = await gptChat([{ role: 'user', content: scriptBlocs }]);
+    const clean = reply.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+
+    document.getElementById('titre1Output').value = parsed.titre1 || '';
+    document.getElementById('texte1Output').value = parsed.texte1 || '';
+    document.getElementById('titre2Output').value = parsed.titre2 || '';
+    document.getElementById('texte2Output').value = parsed.texte2 || '';
+    document.getElementById('titre3Output').value = parsed.titre3 || '';
+    document.getElementById('texte3Output').value = parsed.texte3 || '';
+
+    blocsFinaux = parsed;
+    document.getElementById('blocsContent').style.display = 'block';
+    showStatus('status4', 'success', '✓ 3 blocs générés — modifie si besoin puis valide.');
+  } catch(e) {
+    showStatus('status4', 'error', 'Erreur : ' + e.message);
+    // Fallback : afficher le texte brut
+    document.getElementById('titre1Output').value = 'Erreur de parsing — réessaie';
+    document.getElementById('blocsContent').style.display = 'block';
+  }
+}
+
+function validerBlocs() {
+  blocsFinaux = {
+    titre1: document.getElementById('titre1Output').value,
+    texte1: document.getElementById('texte1Output').value,
+    titre2: document.getElementById('titre2Output').value,
+    texte2: document.getElementById('texte2Output').value,
+    titre3: document.getElementById('titre3Output').value,
+    texte3: document.getElementById('texte3Output').value,
+  };
+  setDot(4, 'done');
+  enableCard(5);
+
+  // Résumé
+  document.getElementById('publishSummary').innerHTML = `
+    <div class="row"><span>Titre</span><span>${titreFinal.substring(0,55)}...</span></div>
+    <div class="row"><span>Description</span><span>${descriptionFinale.substring(0,50)}...</span></div>
+    <div class="row"><span>Tableau</span><span>✓ Généré</span></div>
+    <div class="row"><span>3 Blocs</span><span>✓ Générés</span></div>
     <div class="row"><span>Boutique</span><span>Luminaire Essenza</span></div>`;
 }
 
-// ── PUBLIER ───────────────────────────────────────────────────
-async function publishToShopify() {
-  if (!currentProduct) return;
+// ── ÉTAPE 5 : Publier ─────────────────────────────────────────
+async function publierSurShopify() {
   const btn = document.getElementById('publishBtn');
   btn.disabled = true;
-  showStatus('publishStatus','loading','Mise à jour sur Shopify (1/3 — produit + prix)...');
 
-  const mult = parseFloat(document.getElementById('multiplier').value)||3;
-  const desc = (generatedData.description||'').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
-  const fullHtml = `<p>${desc}</p>${generatedData.specs_html||''}`;
+  const s = parseFloat(document.getElementById('supplierPrice').value) || 0;
+  const price = s > 0 ? (s * 3).toFixed(2) : currentProduct.variants?.[0]?.price;
 
-  // Variantes avec prix individuels
-  const updatedVariants = currentProduct.variants.map((v,i) => {
-    const s = getSupplierPrice(i);
-    const price = s > 0 ? (s*mult).toFixed(2) : v.price;
-    return { id: v.id, price };
-  });
+  showStatus('status5', 'loading', 'Publication sur Shopify (1/3 — titre + description)...');
+
+  // Corps HTML = description + tableau
+  const desc = descriptionFinale.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+  const bodyHtml = `<p>${desc}</p>\n${tableauFinal}`;
 
   try {
-    // 1. Titre + description + prix par variante
+    // 1. Mettre à jour titre + description + prix
     const r1 = await fetch(`${PROXY}/products/${currentProduct.id}.json`, {
       method: 'PUT',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ product: { id: currentProduct.id, title: generatedData.titre, body_html: fullHtml, variants: updatedVariants,
-        metafields_global_title_tag: generatedData.seo_title||'',
-        metafields_global_description_tag: generatedData.seo_desc||''
-      }})
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        product: {
+          id: currentProduct.id,
+          title: titreFinal,
+          body_html: bodyHtml,
+          variants: currentProduct.variants.map(v => ({ id: v.id, price }))
+        }
+      })
     });
-    if (!r1.ok) { const e = await r1.json(); throw new Error(JSON.stringify(e.errors)); }
+    if (!r1.ok) throw new Error('Erreur mise à jour produit');
 
-    showStatus('publishStatus','loading','Mise à jour sur Shopify (2/3 — blocs contenu)...');
+    showStatus('status5', 'loading', 'Publication sur Shopify (2/3 — metafields blocs)...');
 
-    // 2. Metafields blocs
-    await Promise.all([
-      {key:'titre_1', value:generatedData.bloc1_titre||''},
-      {key:'texte_1', value:(generatedData.bloc1_desc||'').replace(/\n/g,'<br>')},
-      {key:'titre_2', value:generatedData.bloc2_titre||''},
-      {key:'texte_2', value:(generatedData.bloc2_desc||'').replace(/\n/g,'<br>')},
-      {key:'titre_3', value:generatedData.bloc3_titre||''},
-      {key:'texte_3', value:(generatedData.bloc3_desc||'').replace(/\n/g,'<br>')}
-    ].map(mf => fetch(`${PROXY}/products/${currentProduct.id}/metafields.json`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({metafield:{namespace:'custom',key:mf.key,value:mf.value,type:'single_line_text_field'}})
-    })));
+    // 2. Metafields
+    const metafields = [
+      { key: 'titre_1', value: blocsFinaux.titre1 || '' },
+      { key: 'texte_1', value: (blocsFinaux.texte1 || '').replace(/\n/g, '<br>') },
+      { key: 'titre_2', value: blocsFinaux.titre2 || '' },
+      { key: 'texte_2', value: (blocsFinaux.texte2 || '').replace(/\n/g, '<br>') },
+      { key: 'titre_3', value: blocsFinaux.titre3 || '' },
+      { key: 'texte_3', value: (blocsFinaux.texte3 || '').replace(/\n/g, '<br>') },
+    ];
 
-    showStatus('publishStatus','loading','Mise à jour sur Shopify (3/3 — variantes FR)...');
+    await Promise.all(metafields.map(mf =>
+      fetch(`${PROXY}/products/${currentProduct.id}/metafields.json`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          metafield: { namespace: 'custom', key: mf.key, value: mf.value, type: 'single_line_text_field' }
+        })
+      })
+    ));
 
-    // 3. Renommer les options en français
-    if (generatedData.variants_fr?.length > 0) {
-      await fetch(`${PROXY}/products/${currentProduct.id}.json`, {
-        method:'PUT', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({product:{ id: currentProduct.id, options: generatedData.variants_fr.map(o=>({name:o.name})) }})
-      });
-    }
-
-    showStatus('publishStatus','success',`✓ Tout mis à jour ! <a href="https://admin.shopify.com/store/luminaire-essenza-2/products/${currentProduct.id}" target="_blank" style="color:inherit;font-weight:600;text-decoration:underline">Voir sur Shopify →</a>`);
+    setDot(5, 'done');
+    showStatus('status5', 'success',
+      `✓ Tout publié ! <a href="https://admin.shopify.com/store/luminaire-essenza-2/products/${currentProduct.id}" target="_blank" style="color:inherit;font-weight:600;text-decoration:underline">Voir sur Shopify →</a>`);
     btn.disabled = false;
 
   } catch(e) {
-    showStatus('publishStatus','error','Erreur : ' + e.message);
+    showStatus('status5', 'error', 'Erreur : ' + e.message);
     btn.disabled = false;
   }
-}
-
-// ── COPIER ────────────────────────────────────────────────────
-function copyField(id, btn) {
-  navigator.clipboard.writeText(document.getElementById(id).textContent).then(() => {
-    const orig = btn.textContent; btn.textContent = '✓ Copié';
-    setTimeout(()=>btn.textContent=orig, 1500);
-  });
-}
-
-function copyAll() {
-  const ids = ['titleOutput','descOutput','specsOutput','bloc1Output','bloc2Output','bloc3Output','seoOutput','variantsOutput'];
-  const text = ids.map(id => `=== ${id.replace('Output','').toUpperCase()} ===\n${document.getElementById(id).textContent}`).join('\n\n');
-  navigator.clipboard.writeText(text).then(() => showStatus('publishStatus','success','✓ Tout copié !'));
-}
-
-// ── IMAGES ───────────────────────────────────────────────────
-const CHATGPT_PROMPT_LUMINAIRE = `Tu es un expert en retouche d'image pour e-commerce. Cette image est un visuel produit pour la boutique de luminaires française "Luminaire Essenza" (couleurs de marque : noir #1b1b1b et blanc).
-
-Modifie cette image en :
-1. Remplaçant TOUT le texte anglais par sa traduction française, en gardant la même mise en page et le même style visuel
-2. Convertissant les mesures en pouces (in) en centimètres (cm)
-3. Utilisant les couleurs de marque noir #1b1b1b et blanc pour les textes
-
-Garde le visuel du produit IDENTIQUE. Ne change que le texte.`;
-
-const CHATGPT_PROMPT_VASE = `Tu es un expert en retouche d'image pour e-commerce. Cette image est un visuel produit pour la boutique de décoration "Maison Vase" (couleurs de marque : blanc, noir et beige #edddc9).
-
-Modifie cette image en :
-1. Remplaçant TOUT le texte anglais par sa traduction française, en gardant la même mise en page et le même style visuel
-2. Convertissant les mesures en pouces (in) en centimètres (cm)
-3. Utilisant les couleurs de marque blanc, noir et beige #edddc9 pour les textes
-
-Garde le visuel du produit IDENTIQUE. Ne change que le texte.`;
-
-async function showImagesCard() {
-  if (!currentProduct?.images?.length) return;
-  const grid = document.getElementById('imagesGrid');
-
-  grid.innerHTML = currentProduct.images.map((img, i) => `
-    <div class="img-card" id="imgcard_${i}">
-      <img src="${img.src}" onerror="this.src=''" />
-      <div class="img-footer">
-        <div class="img-label checking" id="imglabel_${i}">🔍 Analyse...</div>
-      </div>
-    </div>`).join('');
-
-  document.getElementById('imagesCard').style.display = 'block';
-
-  // Analyser chaque image
-  for (let i = 0; i < currentProduct.images.length; i++) {
-    const img = currentProduct.images[i];
-    const label = document.getElementById(`imglabel_${i}`);
-    const footer = document.querySelector(`#imgcard_${i} .img-footer`);
-
-    try {
-      const res = await fetch(SERVER + '/api/analyze-image', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageUrl: img.src })
-      });
-      const data = await res.json();
-
-      if (data.needs_edit) {
-        footer.innerHTML = `
-          <div class="img-label english">⚠ Texte anglais</div>
-          <a href="${img.src}" download="img-${i+1}.jpg" class="btn-shopify-upload" style="background:#e8f0fe;color:#1a56a0;border-color:#1a56a0" target="_blank">⬇ Télécharger</a>
-          <button class="btn-chatgpt" onclick="openChatGPT(${i})">📋 Copier prompt</button>`;
-      } else {
-        footer.innerHTML = `<div class="img-label clean">✓ OK — pas de texte anglais</div>`;
-      }
-    } catch(e) {
-      footer.innerHTML = `<div class="img-label checking">— Non analysé</div>`;
-    }
-  }
-  showStatus('imagesStatus', 'info', 'Images analysées. Pour celles avec texte anglais : télécharge → ouvre ChatGPT → colle le prompt + l'image → récupère l'image corrigée → uploade sur Shopify.');
-}
-
-function openChatGPT(i) {
-  const boutique = document.querySelector('header .badge')?.textContent?.includes('Vase') ? 'vase' : 'luminaire';
-  const prompt = boutique === 'luminaire' ? CHATGPT_PROMPT_LUMINAIRE : CHATGPT_PROMPT_VASE;
-  navigator.clipboard.writeText(prompt).then(() => {
-    window.open('https://chatgpt.com/', '_blank');
-    showStatus('imagesStatus', 'success', `✓ Prompt copié dans le presse-papier ! Dans ChatGPT : colle (Cmd+V), attache l'image n°${i+1} et envoie.`);
-  });
-}
-
-
-function showStatus(id, type, html) {
-  const icons = {loading:'<div class="spinner"></div>', success:'✓', error:'✗'};
-  const el = document.getElementById(id);
-  if (el) el.innerHTML = `<div class="status ${type}">${icons[type]} <span>${html}</span></div>`;
-}
-  
-  // ── IMAGES ───────────────────────────────────────────────────────
-const CHATGPT_PROMPT_LUMINAIRE = `Tu es un expert en retouche d'image pour e-commerce. Cette image est un visuel produit pour une boutique de luminaires française "Luminaire Essenza" (couleurs : noir #1b1b1b et blanc).
-
-Modifie cette image en :
-1. Remplaçant TOUT le texte anglais par sa traduction française (même mise en page, même style de police)
-2. Convertissant les mesures en pouces (in) en centimètres (cm)
-3. Utilisant uniquement les couleurs de la marque : noir #1b1b1b et blanc pour les textes
-
-Garde le visuel du produit IDENTIQUE. Ne modifie que le texte.`;
-
-const CHATGPT_PROMPT_VASE = `Tu es un expert en retouche d'image pour e-commerce. Cette image est un visuel produit pour une boutique de décoration française "Maison Vase" (couleurs : blanc, noir et beige #edddc9).
-
-Modifie cette image en :
-1. Remplaçant TOUT le texte anglais par sa traduction française (même mise en page, même style de police)
-2. Convertissant les mesures en pouces (in) en centimètres (cm)
-3. Utilisant uniquement les couleurs de la marque : blanc, noir et beige #edddc9 pour les textes
-
-Garde le visuel du produit IDENTIQUE. Ne modifie que le texte.`;
-
-async function showImagesCard() {
-  if (!currentProduct?.images?.length) return;
-  const boutique = document.querySelector('header .badge')?.textContent?.includes('Vase') ? 'vase' : 'luminaire';
-  const prompt = boutique === 'luminaire' ? CHATGPT_PROMPT_LUMINAIRE : CHATGPT_PROMPT_VASE;
-  const grid = document.getElementById('imagesGrid');
-
-  // Afficher toutes les images avec un statut "analyse en cours"
-  grid.innerHTML = currentProduct.images.map((img, i) => `
-    <div class="img-card" id="imgcard_${i}">
-      <img src="${img.src}" onerror="this.src=''" />
-      <div class="img-footer">
-        <div class="img-label checking" id="imglabel_${i}">🔍 Analyse...</div>
-      </div>
-    </div>`).join('');
-
-  document.getElementById('imagesCard').style.display = 'block';
-
-  // Analyser chaque image via le serveur
-  for (let i = 0; i < currentProduct.images.length; i++) {
-    const img = currentProduct.images[i];
-    const label = document.getElementById(`imglabel_${i}`);
-    const footer = document.querySelector(`#imgcard_${i} .img-footer`);
-
-    try {
-      const res = await fetch(SERVER + '/api/analyze-image', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageUrl: img.src })
-      });
-      const data = await res.json();
-
-      if (data.needs_edit) {
-        label.className = 'img-label english';
-        label.textContent = '⚠ Texte anglais';
-        // Bouton ChatGPT
-        const chatgptUrl = `https://chatgpt.com/?q=${encodeURIComponent(prompt + '\n\nVoici l\'image à corriger (image ci-jointe) :')}`;
-        footer.innerHTML = `
-          <div class="img-label english">⚠ Texte anglais</div>
-          <a href="${img.src}" download="image-${i+1}.jpg" class="btn-shopify-upload" style="background:#e8f0fe;color:#1a56a0;border-color:#1a56a0">⬇ Télécharger</a>
-          <button class="btn-chatgpt" onclick="openChatGPT(${i})">ChatGPT → Corriger</button>`;
-      } else {
-        label.className = 'img-label clean';
-        label.textContent = '✓ OK';
-      }
-    } catch(e) {
-      label.className = 'img-label clean';
-      label.textContent = '? Non analysé';
-    }
-  }
-}
-
-function openChatGPT(i) {
-  const boutique = document.querySelector('header .badge')?.textContent?.includes('Vase') ? 'vase' : 'luminaire';
-  const prompt = boutique === 'luminaire' ? CHATGPT_PROMPT_LUMINAIRE : CHATGPT_PROMPT_VASE;
-  
-  // Copier le prompt dans le presse-papier
-  navigator.clipboard.writeText(prompt).then(() => {
-    // Ouvrir ChatGPT
-    window.open('https://chatgpt.com/', '_blank');
-    showStatus('imagesStatus', 'info', 
-      `✓ Prompt copié ! Dans ChatGPT : colle le texte, attache l'image n°${i+1}, envoie. Récupère l'image corrigée et uploade-la sur Shopify.`);
-  });
 }
 </script>
 </body>
